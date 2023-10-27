@@ -1,4 +1,4 @@
-package bootstrap
+package configure
 
 type application struct {
 	env         *env
