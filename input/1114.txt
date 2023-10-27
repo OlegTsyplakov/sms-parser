@@ -1,0 +1,12 @@
+rom: 79601246420
+From_TOA: 91 international, ISDN/telephone
+From_SMSC: 79270009076
+Sent: 23-02-10 15:23:46
+Received: 23-02-10 15:24:19
+Subject: GSM1
+Modem: GSM1
+IMSI: 250027131814606
+Report: no
+Alphabet: UTF8
+Length: 30
+0140578573#ХВС-137#ГВС479
