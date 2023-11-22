@@ -3,9 +3,10 @@ package configure
 import (
 	"fmt"
 	"log"
-	"smsparser/iternal/parse"
 	"smsparser/iternal/utils"
 	"sync"
+
+	"smsparser/iternal/parse"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -87,7 +88,10 @@ func (w *watcher) Start() iStop {
 					log.Println("-addToFilteredChannels", fc.filtered_channels)
 					log.Println("-------------------", event.Op.String())
 
-					_, err := parse.CopyFileToOutputDirectory(event.Name, w.env.OutputFolder)
+					if err := parse.ParseSMS(event.Name); err != nil {
+						log.Println("parse sms err:", err)
+					}
+					_, err := utils.CopyFileToOutputDirectory(event.Name, w.env.OutputFolder)
 					if err != nil {
 						log.Println("event err:", err)
 					}

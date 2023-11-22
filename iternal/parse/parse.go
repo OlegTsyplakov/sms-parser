@@ -1,32 +1,22 @@
 package parse
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"os"
 )
 
-func CopyFileToOutputDirectory(src string, dst string) (int64, error) {
+func ParseSMS(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
 
-	sourceFileStat, err := os.Stat(src)
-	if err != nil {
-		return 0, err
-	}
-	if !sourceFileStat.Mode().IsRegular() {
-		return 0, fmt.Errorf("%s is not a regular file", src)
-	}
-	dst = dst + "/" + sourceFileStat.Name()
-	source, err := os.Open(src)
-	if err != nil {
-		return 0, err
-	}
-	defer source.Close()
+	for scanner.Scan() {
 
-	destination, err := os.Create(dst)
-	if err != nil {
-		return 0, err
+		fmt.Print(scanner.Text() + "\n")
 	}
-	defer destination.Close()
-	nBytes, err := io.Copy(destination, source)
-	return nBytes, err
+	return nil
 }
