@@ -1,7 +1,6 @@
 package configure
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/fsnotify/fsnotify"
@@ -18,25 +17,22 @@ type env struct {
 
 func newEnv() *env {
 	env := env{}
-	env.loadConfiguration()
 	return &env
 }
 
-func (env *env) loadConfiguration() {
+func (env *env) configure() *env {
 	viper.SetConfigFile(".env")
 	err := viper.ReadInConfig()
 
 	if err != nil {
 		log.Fatal("Can't find the file .env : ", err)
 	}
-
-	viper.WatchConfig()
-	viper.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("Config file changed:", e.Name)
-		viper.Unmarshal(&env)
-		fmt.Println("env.FileExtensions:", env.EventsToListen)
+	viper.OnConfigChange(func(event fsnotify.Event) {
+		if event.Has(fsnotify.Write) {
+			viper.Unmarshal(&env)
+		}
 	})
-
+	viper.WatchConfig()
 	err = viper.Unmarshal(&env)
 	if err != nil {
 		log.Fatal("Environment can't be loaded: ", err)
@@ -45,4 +41,5 @@ func (env *env) loadConfiguration() {
 	if env.AppEnv == "development" {
 		log.Println("The App is running in development env")
 	}
+	return env
 }

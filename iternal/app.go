@@ -1,5 +1,9 @@
 package configure
 
+import (
+	"os"
+)
+
 type application struct {
 	env         *env
 	fileWatcher iStart
@@ -11,8 +15,8 @@ type iApplication interface {
 
 func App() iApplication {
 	app := &application{}
-	app.env = newEnv()
-	app.fileWatcher = newWatcher().configurePath(app.env.InputFolder).configureEvents(app.env.EventsToListen)
+	app.env = newEnv().configure()
+	app.fileWatcher = newWatcher().configure(app.env)
 	return app
 }
 
@@ -25,4 +29,8 @@ func (a *application) Start() {
 
 	<-done
 
+}
+
+func (a *application) Stop() {
+	os.Exit(0)
 }
