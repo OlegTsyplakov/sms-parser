@@ -1,7 +1,7 @@
 package main
 
 import (
-	configure "smsparser/iternal"
+	configure "smsparser/iternal/configure"
 )
 
 func main() {

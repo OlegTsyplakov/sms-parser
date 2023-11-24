@@ -9,6 +9,7 @@ import (
 
 type env struct {
 	AppEnv         string   `mapstructure:"APP_ENV"`
+	LogFolder      string   `mapstructure:"Log_Folder"`
 	InputFolder    string   `mapstructure:"Input_Folder"`
 	OutputFolder   string   `mapstructure:"Output_Folder"`
 	FileExtensions []string `mapstructure:"File_Extensions"`
