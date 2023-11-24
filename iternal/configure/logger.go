@@ -3,6 +3,9 @@ package configure
 import (
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
+	"time"
 )
 
 type logLevel int
@@ -13,7 +16,7 @@ const (
 	err
 )
 
-func (ll logLevel) string() string {
+func (ll logLevel) toString() string {
 	return [...]string{"[info]", "[warn]", "[error]"}[ll]
 }
 
@@ -30,12 +33,15 @@ type iLogLevel interface {
 	Error(message string)
 }
 type logger struct {
-	env  *env
-	file *os.File
+	env       *env
+	file      *os.File
+	timestamp time.Time
 }
 
 func newLogger() iLogger {
-	return &logger{}
+	return &logger{
+		timestamp: time.Now().Round(time.Second),
+	}
 }
 
 func (l *logger) configure(env *env) iStartLogger {
@@ -43,7 +49,7 @@ func (l *logger) configure(env *env) iStartLogger {
 	return l
 }
 func (l *logger) Start() iLogLevel {
-	file, err := openLogFile(l.env.LogFolder)
+	file, err := l.openLogFile(l.env.LogFolder)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,8 +57,9 @@ func (l *logger) Start() iLogLevel {
 	return l
 }
 
-func openLogFile(path string) (*os.File, error) {
-
+func (l *logger) openLogFile(folder string) (*os.File, error) {
+	file := l.createLogFile()
+	path := filepath.Join(folder, file)
 	logFile, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err
@@ -60,20 +67,29 @@ func openLogFile(path string) (*os.File, error) {
 	return logFile, nil
 }
 
-func (l *logger) Information(message string) {
-	var ll logLevel = info
-	customLog := log.New(l.file, ll.string(), log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
-	customLog.Println(message)
+func (l *logger) createLogFile() string {
+	var file strings.Builder
+	file.WriteString("log-")
+	file.WriteString(l.timestamp.Format("2006-01-02_150405"))
+	file.WriteString(".log")
+	return file.String()
 }
 
+func (l *logger) Information(message string) {
+	var ll logLevel = info
+	l.print(ll, message)
+}
 func (l *logger) Warning(message string) {
 	var ll logLevel = warn
-	customLog := log.New(l.file, ll.string(), log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
-	customLog.Println(message)
+	l.print(ll, message)
 }
 
 func (l *logger) Error(message string) {
 	var ll logLevel = err
-	customLog := log.New(l.file, ll.string(), log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
+	l.print(ll, message)
+}
+
+func (l *logger) print(ll logLevel, message string) {
+	customLog := log.New(l.file, ll.toString(), log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
 	customLog.Println(message)
 }

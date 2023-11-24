@@ -22,9 +22,9 @@ func App() iApplication {
 	return app
 }
 
-func (a *application) Start() {
-	fileWatcher := a.fileWatcher.Start()
-	a.logger.Information("application started")
+func (app *application) Start() {
+	fileWatcher := app.fileWatcher.Start()
+	app.logger.Information("application started")
 	defer func() {
 		fileWatcher.Stop()
 	}()
@@ -34,7 +34,7 @@ func (a *application) Start() {
 
 }
 
-func (a *application) Stop() {
-	a.logger.Information("application stoped")
+func (app *application) Stop() {
+	app.logger.Information("application stoped")
 	os.Exit(0)
 }
